@@ -1,4 +1,4 @@
-MONGODIR=~/mongodb/bin
+MONGODIR=./req/mongodb/bin
 
 db:	
 	$(MONGODIR)/mongod
