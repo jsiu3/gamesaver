@@ -41,48 +41,56 @@ cd .. #back into gamesaver dir
 
 if (which npm > /dev/null); then echo "npm ok"; else
     echo "Getting npm tar..."
-    curl http://npmjs.org/install.sh | sudo sh
+    cd req
+    	curl http://npmjs.org/install.sh -o "npminstall.sh"
+	sudo sh npminstall.sh
+	echo "did npm install correctly?" 
+	echo "If not ctrl-c, su root, sh ./req/npminstall.sh then run install again"
+	echo "else press enter to continue..."
+	read 
+    cd ..
 fi
 npm install 
 
 cd req
-    echo "Getting MongoDB..."
-    rm -r mongo* > /dev/null
-    
-    while [[ "$os" != "linux32" && "$os" != "linux64" && "$os" != "osx32" && "$os" != "osx64" ]]
-    do
-        echo "Please enter a valid OS (linux32, linux64, osx32, osx64):"
-        read os
-        case $os in
-            linux32)
-                curl -L http://fastdl.mongodb.org/linux/mongodb-linux-i686-2.0.1.tgz | tar -xz
-                mv mongodb-linux-i686-2.0.1/ mongodb
-                ;;
-            linux64)
-                curl -L http://fastdl.mongodb.org/linux/mongodb-linux-x86_64-2.0.1.tgz | tar -xz
-                mv mongodb-linux-x86_64-2.0.1/ mongodb
-                ;;
-            osx32)
-                curl -L http://fastdl.mongodb.org/osx/mongodb-osx-i386-2.0.1.tgz | tar -xz
-                mv mongodb-osx-i386-2.0.1/ mongodb
-                ;;
-            osx64)
-                curl -L http://fastdl.mongodb.org/osx/mongodb-osx-x86_64-2.0.1.tgz | tar -xz
-                mv mongodb-osx-x86_64-2.0.1/ mongodb
-                ;;
-            *)  #empty to catch all other and restart the loop
-                ;;
-        esac
-    done
+    echo "Checking MongoDB..."
+    if [ -d ./mongodb ]; then echo "MongoDB ok"; else
+	    while [[ "$os" != "linux32" && "$os" != "linux64" && "$os" != "osx32" && "$os" != "osx64" ]]
+	    do
+		echo "Please enter a valid OS (linux32, linux64, osx32, osx64):"
+		read os
+		case $os in
+		    linux32)
+		        curl -L http://fastdl.mongodb.org/linux/mongodb-linux-i686-2.0.1.tgz | tar -xz
+		        mv mongodb-linux-i686-2.0.1/ mongodb
+		        ;;
+		    linux64)
+		        curl -L http://fastdl.mongodb.org/linux/mongodb-linux-x86_64-2.0.1.tgz | tar -xz
+		        mv mongodb-linux-x86_64-2.0.1/ mongodb
+		        ;;
+		    osx32)
+		        curl -L http://fastdl.mongodb.org/osx/mongodb-osx-i386-2.0.1.tgz | tar -xz
+		        mv mongodb-osx-i386-2.0.1/ mongodb
+		        ;;
+		    osx64)
+		        curl -L http://fastdl.mongodb.org/osx/mongodb-osx-x86_64-2.0.1.tgz | tar -xz
+		        mv mongodb-osx-x86_64-2.0.1/ mongodb
+		        ;;
+		    *)  #empty to catch all other and restart the loop
+		        ;;
+		esac
+	    done
+    fi
 cd ..
 
-mkdir -p /data/db #makes folder dependency for mongodb
+sudo mkdir -p /data/db #makes folder dependency for mongodb
 
 nohup make db > dbOutput.txt 2> dbErrors.txt < /dev/null &      #runs make db command backgrounded..
 
-echo "Changing DB... Adding user..."
+echo "When you see '>' You're in mongoDB Shell please type:"
+echo "use Gladius"
+echo 'db.addUser("test", "test");'
+echo "exit"
 ./req/mongodb/bin/mongo
-use Gladius
-db.addUser("test", "test");
-exit
 echo "Done."
+exit
